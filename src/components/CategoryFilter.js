@@ -1,10 +1,19 @@
 import React from "react";
 
-function CategoryFilter() {
+function CategoryFilter({ categories, selectedCategory, onSelectCategory }) {
   return (
-    <div className="categories">
-      <h5>Category filters</h5>
-      {/* render <button> elements for each category here */}
+    <div>
+      {categories.map((cat) => (
+        <button
+          key={cat}
+          onClick={() => onSelectCategory(cat)}
+          style={{
+            fontWeight: selectedCategory === cat ? "bold" : "normal",
+          }}
+        >
+          {cat}
+        </button>
+      ))}
     </div>
   );
 }

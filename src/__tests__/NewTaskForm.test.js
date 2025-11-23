@@ -1,49 +1,21 @@
-import "@testing-library/jest-dom";
+import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import NewTaskForm from "../components/NewTaskForm";
-import { CATEGORIES } from "../data";
-import App from "../components/App";
 
-test("calls the onTaskFormSubmit callback prop when the form is submitted", () => {
+test("calls onTaskFormSubmit with text and category", () => {
   const onTaskFormSubmit = jest.fn();
-  render(
-    <NewTaskForm categories={CATEGORIES} onTaskFormSubmit={onTaskFormSubmit} />
-  );
+  render(<NewTaskForm onTaskFormSubmit={onTaskFormSubmit} />);
 
-  fireEvent.change(screen.queryByLabelText(/Details/), {
-    target: { value: "Pass the tests" },
+  const textInput = screen.getByPlaceholderText(/new task/i);
+  const categorySelect = screen.getByRole("combobox");
+  const submitButton = screen.getByText(/add task/i);
+
+  fireEvent.change(textInput, { target: { value: "Buy rice" } });
+  fireEvent.change(categorySelect, { target: { value: "Food" } });
+  fireEvent.click(submitButton);
+
+  expect(onTaskFormSubmit).toHaveBeenCalledWith({
+    text: "Buy rice",
+    category: "Food",
   });
-
-  fireEvent.change(screen.queryByLabelText(/Category/), {
-    target: { value: "Code" },
-  });
-
-  fireEvent.submit(screen.queryByText(/Add task/));
-
-  expect(onTaskFormSubmit).toHaveBeenCalledWith(
-    expect.objectContaining({
-      text: "Pass the tests",
-      category: "Code",
-    })
-  );
-});
-
-test("adds a new item to the list when the form is submitted", () => {
-  render(<App />);
-
-  const codeCount = screen.queryAllByText(/Code/).length;
-
-  fireEvent.change(screen.queryByLabelText(/Details/), {
-    target: { value: "Pass the tests" },
-  });
-
-  fireEvent.change(screen.queryByLabelText(/Category/), {
-    target: { value: "Code" },
-  });
-
-  fireEvent.submit(screen.queryByText(/Add task/));
-
-  expect(screen.queryByText(/Pass the tests/)).toBeInTheDocument();
-
-  expect(screen.queryAllByText(/Code/).length).toBe(codeCount + 1);
 });

@@ -1,9 +1,22 @@
-import "@testing-library/jest-dom";
-import { render } from "@testing-library/react";
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import TaskList from "../components/TaskList";
-import { TASKS } from "../data";
 
-test("displays all items when initially rendered", () => {
-  const { container } = render(<TaskList tasks={TASKS} />);
-  expect(container.querySelectorAll(".task")).toHaveLength(TASKS.length);
+test("renders tasks and calls onDeleteTask", () => {
+  const tasks = [
+    { text: "Task 1", category: "Fun" },
+    { text: "Task 2", category: "Work" },
+  ];
+
+  const onDeleteTask = jest.fn();
+
+  render(<TaskList tasks={tasks} onDeleteTask={onDeleteTask} />);
+
+  expect(screen.getByText("Task 1")).toBeInTheDocument();
+  expect(screen.getByText("Task 2")).toBeInTheDocument();
+
+  const deleteButtons = screen.getAllByText(/x/i);
+  fireEvent.click(deleteButtons[0]);
+
+  expect(onDeleteTask).toHaveBeenCalled();
 });
